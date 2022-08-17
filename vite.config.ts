@@ -21,7 +21,14 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
     Components({
+      extensions: ['ts','vue'],
       resolvers: [ElementPlusResolver()],
+      types: [
+        {
+          from: 'vue-router',
+          names: ['RouterLink', 'RouterView'],
+        },
+      ],
     }),
   ],
 })

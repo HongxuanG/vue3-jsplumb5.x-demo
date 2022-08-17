@@ -18,7 +18,7 @@
         <el-main>
           <div class="main">
 
-            <router-view></router-view>
+            <RouterView></RouterView>
           </div>
         </el-main>
       </el-container>

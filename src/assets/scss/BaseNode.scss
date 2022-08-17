@@ -1,0 +1,24 @@
+.node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid #000;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  box-sizing: border-box;
+  &-circle{
+    border-radius: 50%;
+  }
+  &-roundrect{
+    border-radius: 6px;
+  }
+  &-square{
+  }
+  &-delta{
+    
+  }
+  &-ellipse{
+    border-radius: 50px;
+  }
+}
