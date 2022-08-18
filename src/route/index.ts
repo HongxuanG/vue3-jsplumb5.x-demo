@@ -5,7 +5,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: '/',
-    redirect: '/home',
+    redirect: {
+      name: 'JSPlumbIndex'
+    },
   },
   {
     path: '/home',

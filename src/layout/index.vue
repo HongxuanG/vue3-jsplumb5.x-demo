@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container class="outside-container">
       <el-header class="header">
-        <h2 class="">流程图-demo</h2>
+        <h2 class="">工作流-demo</h2>
       </el-header>
       <el-container>
         <el-aside width="200px" class="aside">

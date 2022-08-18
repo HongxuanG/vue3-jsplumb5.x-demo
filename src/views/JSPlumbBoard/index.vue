@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { ready, newInstance, BrowserJsPlumbInstance } from '@jsplumb/browser-ui'
 import {
   StateMachineConnector,
   BezierConnector,
 } from '@jsplumb/connector-bezier'
-import { NodeConfig } from '@/config/btnConfig';
+import { NodeConfig } from '@/config/btnConfig'
+import { defaultFlowGraph } from '@/config/defaultFlow'
 
 const wrapper = ref<Element>()
 const item1 = ref<Element>()
@@ -77,6 +78,32 @@ onMounted(() => {
     connection2()
   })
 })
+
+const scale = ref(1)
+
+const wrapperPosition = reactive({
+  left: 0,
+  right: 0,
+})
+
+const flowWrapperStyle = computed(() => {
+  return {
+    transform: `scale(${scale.value})`,
+    left: wrapperPosition.left + 'px',
+    right: wrapperPosition.right + 'px',
+  }
+})
+
+// 空格 + 左键按下
+const handleSpaceMouseDown = () => {
+  console.log('space + left mouse down')
+}
+const handleSpaceMouseMove = () => {
+  console.log('space + left mouse move')
+}
+const handleSpaceMouseUp = () => {
+  console.log('space + left mouse up')
+}
 </script>
 <script lang="ts">
 export default {
@@ -86,51 +113,58 @@ export default {
 <template>
   <div class="wrapper">
     <div class="menuWrapper">
-      <div class="menuItem" v-for="(menuItem,index) in NodeConfig" :key="index">
+      <div
+        class="menuItem"
+        v-for="(menuItem, index) in NodeConfig"
+        :key="index"
+      >
         <div class="menuItem-template">
-          <BaseNode :type="menuItem.type" :width="menuItem.width" :height="menuItem.height" left="50px" top="50px" style="position: static;"></BaseNode>
-
+          <BaseNode
+            :type="menuItem.type"
+            :width="menuItem.width"
+            :height="menuItem.height"
+            left="50px"
+            top="50px"
+            style="position: static"
+          ></BaseNode>
         </div>
-        <h3 class="menuItem-name">{{menuItem.name}}</h3>
+        <h3 class="menuItem-name">{{ menuItem.name }}</h3>
       </div>
     </div>
 
-    <div class="flowWrapper" ref="wrapper">
-      <BaseNode type="square" left="50px" top="top: 50px"></BaseNode>
-      <BaseNode type="circle" left="150px" top="top: 250px"></BaseNode>
-      <div
-        id="item-1"
-        ref="item1"
-        class="state-item jtk-node"
-        style="left: 50px; top: 50px"
-      ></div>
-      <div
-        id="item-2"
-        ref="item2"
-        class="state-item"
-        style="left: 150px; top: 250px"
-      ></div>
-      <div
-        id="item-3"
-        ref="item3"
-        class="state-item"
-        style="left: 200px; top: 200px"
-      >
-        State 3
+    <div class="flowWrapper" @mousedown.space.exact="handleSpaceMouseDown" @mousemove.space.exact="handleSpaceMouseMove" @mouseup.space.exact="handleSpaceMouseUp">
+      <div :style="flowWrapperStyle" class="flowWrapper-container" ref="wrapper">
+        <BaseNode type="square" left="50px" top="top: 50px"></BaseNode>
+        <BaseNode type="circle" left="150px" top="top: 250px"></BaseNode>
+        <div
+          id="item-1"
+          ref="item1"
+          class="state-item jtk-node"
+          style="left: 50px; top: 50px"
+        ></div>
+        <div
+          id="item-2"
+          ref="item2"
+          class="state-item"
+          style="left: 150px; top: 250px"
+        ></div>
+        <div
+          id="item-3"
+          ref="item3"
+          class="state-item"
+          style="left: 200px; top: 200px"
+        >
+          State 3
+        </div>
+        <div
+          id="item-4"
+          ref="item4"
+          class="state-item"
+          style="left: 300px; top: 300px"
+        >
+          State 4
+        </div>
       </div>
-      <div
-        id="item-4"
-        ref="item4"
-        class="state-item"
-        style="left: 300px; top: 300px"
-      >
-        State 4
-      </div>
-      <div id="item-5" class="state-item">State 5</div>
-      <div id="item-6" class="state-item">State 6</div>
-      <div id="item-7" class="state-item">State 7</div>
-      <div id="item-8" class="state-item">State 8</div>
-      <div id="item-9" class="state-item">State 9</div>
     </div>
   </div>
 </template>
@@ -150,10 +184,10 @@ export default {
   height: 100%;
   background-color: #fff;
   .menuItem {
-    &-name{
+    &-name {
       text-align: center;
     }
-    &-template{
+    &-template {
       display: flex;
       flex-flow: row nowrap;
       justify-content: center;
@@ -165,12 +199,15 @@ export default {
 }
 .flowWrapper {
   flex: 1 1 auto;
-  position: relative;
   box-sizing: border-box;
   background: url('@/assets/image/point.png') repeat;
   width: 100%;
   height: 100%;
-  padding: 60px 80px;
+  &-container{
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
 }
 .state-item {
   position: absolute;
