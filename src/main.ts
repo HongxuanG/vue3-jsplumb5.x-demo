@@ -7,7 +7,7 @@ import App from './App.vue'
 import route from '@/route/index'
 import { createRouter, createWebHistory } from 'vue-router'
 import '@jsplumb/browser-ui/css/jsplumbtoolkit.css'
-import { mouseDownSpace } from './utils/customDirectives'
+import { mouseDownSpace, mousewheelAlt } from './utils/customDirectives'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -19,5 +19,6 @@ app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 app.use(router)
 
 app.directive('mousedownspace', mouseDownSpace)
+app.directive('mousewheelalt', mousewheelAlt)
 
 app.mount('#app')

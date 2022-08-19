@@ -8,7 +8,7 @@ import {
 import { NodeConfig } from '@/config/btnConfig'
 import { defaultFlowGraph } from '@/config/defaultFlow'
 import BaseNode from '@/components/BaseNode'
-import { DeltaXY } from '@/utils/customDirectives'
+import { resultXY } from '@/utils/customDirectives'
 
 const wrapper = ref<Element>()
 const item1 = ref<Element>()
@@ -74,31 +74,28 @@ const scale = ref(1)
 
 const wrapperPosition = reactive({
   left: 0,
-  right: 0,
+  top: 0,
 })
 
 const flowWrapperStyle = computed(() => {
   return {
     transform: `scale(${scale.value})`,
     left: wrapperPosition.left + 'px',
-    right: wrapperPosition.right + 'px',
+    top: wrapperPosition.top + 'px',
   }
 })
 
 const nodeRefs = ref<InstanceType<typeof BaseNode>[]>([])
 
-
-// 空格 + 左键按下
-const handleSpaceMouseDown = (delta: DeltaXY) => {
-  console.log(delta)
-  console.log('space + left mouse down')
+const handleSpaceMouseMove = (resultPoint: resultXY) => {
+  console.log('delta', resultPoint)
+  wrapperPosition.left = resultPoint.x
+  wrapperPosition.top = resultPoint.y
+  console.log('space + left mouse move')
 }
-const handleSpaceMouseMove = () => {
-    
-    console.log('space + left mouse move')
-}
-const handleSpaceMouseUp = () => {
-  console.log('space + left mouse up')
+const handleScale = (zoom: number) => {
+  console.log('zoom==>', zoom)
+  scale.value += zoom
 }
 </script>
 <script lang="ts">
@@ -129,8 +126,9 @@ export default {
     </div>
 
     <div
-      class="flowWrapper" 
-      v-mousedownspace="handleSpaceMouseDown"
+      class="flowWrapper"
+      v-mousedownspace="handleSpaceMouseMove"
+      v-mousewheelalt="handleScale"
     >
       <div
         :style="flowWrapperStyle"
@@ -186,6 +184,9 @@ export default {
   background: url('@/assets/image/point.png') repeat;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  transform-origin: top left;
+  transition: all 0.3s linear;
   &-container {
     position: relative;
     width: 100%;
