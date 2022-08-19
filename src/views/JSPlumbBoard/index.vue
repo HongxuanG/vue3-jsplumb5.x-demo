@@ -7,6 +7,8 @@ import {
 } from '@jsplumb/connector-bezier'
 import { NodeConfig } from '@/config/btnConfig'
 import { defaultFlowGraph } from '@/config/defaultFlow'
+import BaseNode from '@/components/BaseNode'
+import { DeltaXY } from '@/utils/customDirectives'
 
 const wrapper = ref<Element>()
 const item1 = ref<Element>()
@@ -24,8 +26,8 @@ const simpleConnection = () => {
   // 定义了一条连接线
   plumbIns.connect({
     // 对应上述基本概念
-    source: item1.value,
-    target: item2.value,
+    source: nodeRefs.value[0].$el,
+    target: nodeRefs.value[1].$el,
     anchor: 'AutoDefault',
     connector: {
       type: StateMachineConnector.type,
@@ -44,8 +46,10 @@ const simpleConnection = () => {
   })
 }
 const connection1 = () => {
-  const ep1 = plumbIns.addEndpoint(item3.value!, { endpoint: 'Dot' })
-  const ep2 = plumbIns.addEndpoint(item4.value!, { endpoint: 'Rectangle' })
+  const ep1 = plumbIns.addEndpoint(nodeRefs.value[2].$el, { endpoint: 'Dot' })
+  const ep2 = plumbIns.addEndpoint(nodeRefs.value[3].$el, {
+    endpoint: 'Rectangle',
+  })
   plumbIns.connect({
     source: ep1,
     target: ep2,
@@ -57,25 +61,12 @@ const connection1 = () => {
     ],
   })
 }
-const connection2 = () => {
-  plumbIns.connect({
-    source: item4.value,
-    target: item2.value,
-    anchor: 'Continuous',
-    connector: BezierConnector.type,
-    overlays: [
-      { type: 'Label', options: { label: 'Connection 2', location: 0.5 } },
-      { type: 'Arrow', options: { location: 1 } },
-    ],
-  })
-}
 onMounted(() => {
   jsplumbInit()
 
   ready(() => {
     simpleConnection()
     connection1()
-    connection2()
   })
 })
 
@@ -94,12 +85,17 @@ const flowWrapperStyle = computed(() => {
   }
 })
 
+const nodeRefs = ref<InstanceType<typeof BaseNode>[]>([])
+
+
 // 空格 + 左键按下
-const handleSpaceMouseDown = () => {
+const handleSpaceMouseDown = (delta: DeltaXY) => {
+  console.log(delta)
   console.log('space + left mouse down')
 }
 const handleSpaceMouseMove = () => {
-  console.log('space + left mouse move')
+    
+    console.log('space + left mouse move')
 }
 const handleSpaceMouseUp = () => {
   console.log('space + left mouse up')
@@ -132,38 +128,25 @@ export default {
       </div>
     </div>
 
-    <div class="flowWrapper" @mousedown.space.exact="handleSpaceMouseDown" @mousemove.space.exact="handleSpaceMouseMove" @mouseup.space.exact="handleSpaceMouseUp">
-      <div :style="flowWrapperStyle" class="flowWrapper-container" ref="wrapper">
-        <BaseNode type="square" left="50px" top="top: 50px"></BaseNode>
-        <BaseNode type="circle" left="150px" top="top: 250px"></BaseNode>
-        <div
-          id="item-1"
-          ref="item1"
-          class="state-item jtk-node"
-          style="left: 50px; top: 50px"
-        ></div>
-        <div
-          id="item-2"
-          ref="item2"
-          class="state-item"
-          style="left: 150px; top: 250px"
-        ></div>
-        <div
-          id="item-3"
-          ref="item3"
-          class="state-item"
-          style="left: 200px; top: 200px"
-        >
-          State 3
-        </div>
-        <div
-          id="item-4"
-          ref="item4"
-          class="state-item"
-          style="left: 300px; top: 300px"
-        >
-          State 4
-        </div>
+    <div
+      class="flowWrapper" 
+      v-mousedownspace="handleSpaceMouseDown"
+    >
+      <div
+        :style="flowWrapperStyle"
+        class="flowWrapper-container"
+        ref="wrapper"
+      >
+        <BaseNode
+          v-for="node in defaultFlowGraph"
+          ref="nodeRefs"
+          :key="node.id"
+          :width="node.width"
+          :height="node.height"
+          :type="node.type"
+          :left="node.left"
+          :top="node.top"
+        ></BaseNode>
       </div>
     </div>
   </div>
@@ -203,7 +186,7 @@ export default {
   background: url('@/assets/image/point.png') repeat;
   width: 100%;
   height: 100%;
-  &-container{
+  &-container {
     position: relative;
     width: 100%;
     height: 100%;

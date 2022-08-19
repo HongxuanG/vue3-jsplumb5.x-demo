@@ -55,6 +55,7 @@ export default defineComponent({
         {
           width: normalizeStyleValue(props.width),
           height: normalizeStyleValue(props.height),
+          style: `position: absolute; top: ${props.top}; left: ${props.left};`,
         },
         [
           h('polygon', {
