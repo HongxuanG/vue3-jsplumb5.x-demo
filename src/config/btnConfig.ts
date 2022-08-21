@@ -4,6 +4,7 @@ export enum EnumNode {
   CIRCLE = 'circle',
   ELLIPSE = 'ellipse',
   ROUNDRECT = 'roundrect',
+  TEMPNODE = 'tempNode'
 }
 export const NodeConfig = [
   {
@@ -45,5 +46,13 @@ export const NodeConfig = [
     type: EnumNode.ROUNDRECT,
     width: '100px',
     height: '40px',
+  },
+  {
+    id: '6',
+    name: '可追加的节点',
+    type: EnumNode.TEMPNODE,
+    width: '30px',
+    height: '30px',
+    ref: 'tempNode',
   },
 ]

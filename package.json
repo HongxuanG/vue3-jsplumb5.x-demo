@@ -16,7 +16,7 @@
     "@jsplumb/connector-flowchart": "^5.10.6",
     "@jsplumb/core": "^5.10.6",
     "@jsplumb/util": "^5.10.6",
-    "element-plus": "^2.2.13",
+    "element-plus": "^2.2.14",
     "sass": "^1.54.4",
     "vue": "^3.2.37",
     "vue-router": "^4.1.3",

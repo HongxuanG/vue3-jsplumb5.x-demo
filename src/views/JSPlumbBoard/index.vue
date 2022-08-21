@@ -13,56 +13,31 @@ import draggable from 'vuedraggable'
 import { createConnect, initJsPlumb } from './jsPlumb'
 const wrapper = ref<HTMLElement>()
 
-let plumbIns: BrowserJsPlumbInstance
 const jsplumbInit = () => {
   initJsPlumb(wrapper.value!)
 }
-const simpleConnection = () => {
-  // 定义了一条连接线
-  createConnect(nodeRefs.value[0].$el, nodeRefs.value[1].$el)
-  // plumbIns.connect({
-  //   // 对应上述基本概念
-  //   source: nodeRefs.value[0].$el,
-  //   target: nodeRefs.value[1].$el,
-  //   anchor: 'AutoDefault',
-  //   connector: {
-  //     type: StateMachineConnector.type,
-  //     options: {
-  //       curviness: 50,
-  //     },
-  //   },
-  //   overlays: [
-  //     { type: 'Arrow', options: { location: 1 } },
-  //     {
-  //       type: 'Label',
-  //       options: { label: 'foo', location: 0.25, id: 'myLabel' },
-  //     },
-  //   ],
-  //   endpoints: ['Dot', 'Blank'],
-  // })
-}
-const connection1 = () => {
-  const ep1 = plumbIns.addEndpoint(nodeRefs.value[2].$el, { endpoint: 'Dot' })
-  const ep2 = plumbIns.addEndpoint(nodeRefs.value[3].$el, {
-    endpoint: 'Rectangle',
-  })
-  plumbIns.connect({
-    source: ep1,
-    target: ep2,
-    anchors: ['Bottom', 'Top'],
-    connector: BezierConnector.type,
-    overlays: [
-      { type: 'Arrow', options: { location: 1 } },
-      { type: 'Label', options: { label: 'Connection 1', location: 0.5 } },
-    ],
+
+const drawFlowGraph = () => {
+  // 画图
+  defaultFlowGraph.forEach((node)=>{
+    const prevNodeRef = refsList.find(item=>item.id === node.stepId)
+    const nextNodeRef = refsList.find(item=>item.id === node.nextStepId)
+    if(prevNodeRef){
+      if(nextNodeRef){
+        createConnect(prevNodeRef.$el, nextNodeRef.$el)
+
+      }
+    }
+
   })
 }
+
 onMounted(() => {
+  // 初始化
   jsplumbInit()
 
   ready(() => {
-    simpleConnection()
-    connection1()
+    drawFlowGraph()
   })
 })
 
@@ -81,7 +56,6 @@ const flowWrapperStyle = computed(() => {
   }
 })
 
-const nodeRefs = ref<InstanceType<typeof BaseNode>[]>([])
 // 设置画布的left 和 top 偏移量
 const handleSpaceMouseMove = (resultPoint: resultXY) => {
   wrapperPosition.left = resultPoint.x
@@ -107,6 +81,12 @@ const handleFlowMoveStart = (event: any) => {
 const handleFlowMoveEnd = (event: any) => {
   console.log('handleFlowMoveEnd==>', event)
 }
+const refsList: InstanceType<typeof BaseNode>[] = []
+const getRefs = (el: any) => {
+  console.log('el==>',el);
+  refsList.push(el)
+}
+
 </script>
 <script lang="ts">
 export default {
@@ -160,22 +140,24 @@ export default {
         class="flowWrapper-container"
         ref="wrapper"
       >
-        <draggable
-          class="node-addible"
-          :group="{ name: 'node', pull: false, put: true }"
-        >
-          <template #item> </template>
-        </draggable>
-        <BaseNode
-          v-for="node in defaultFlowGraph"
-          ref="nodeRefs"
-          :key="node.id"
-          :width="node.width"
-          :height="node.height"
-          :type="node.type"
-          :left="node.left"
-          :top="node.top"
-        ></BaseNode>
+        <template v-for="node in defaultFlowGraph" :key="node.stepId">
+          <draggable
+            class="node-addible"
+            :id="'addibleNode'+node.stepId"
+            :group="{ name: 'node', pull: false, put: true }"
+          >
+            <template #item> </template>
+          </draggable>
+          <BaseNode
+            :id="node.stepId"
+            :ref="getRefs"
+            :width="node.width"
+            :height="node.height"
+            :type="node.type"
+            :left="node.left"
+            :top="node.top"
+          ></BaseNode>
+        </template>
       </div>
     </div>
   </div>

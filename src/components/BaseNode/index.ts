@@ -8,6 +8,10 @@ export default defineComponent({
       type: String as PropType<EnumNode>,
       default: EnumNode.SQUARE,
     },
+    id: {
+      type: String,
+      require: true
+    },
     width: {
       type: [String, Number],
       default: null,
