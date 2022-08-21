@@ -9,41 +9,37 @@ import { NodeConfig } from '@/config/btnConfig'
 import { defaultFlowGraph } from '@/config/defaultFlow'
 import BaseNode from '@/components/BaseNode'
 import { resultXY } from '@/utils/customDirectives'
-
-const wrapper = ref<Element>()
-const item1 = ref<Element>()
-const item2 = ref<Element>()
-const item3 = ref<Element>()
-const item4 = ref<Element>()
+import draggable from 'vuedraggable'
+import { createConnect, initJsPlumb } from './jsPlumb'
+const wrapper = ref<HTMLElement>()
 
 let plumbIns: BrowserJsPlumbInstance
 const jsplumbInit = () => {
-  plumbIns = newInstance({
-    container: wrapper.value,
-  })
+  initJsPlumb(wrapper.value!)
 }
 const simpleConnection = () => {
   // 定义了一条连接线
-  plumbIns.connect({
-    // 对应上述基本概念
-    source: nodeRefs.value[0].$el,
-    target: nodeRefs.value[1].$el,
-    anchor: 'AutoDefault',
-    connector: {
-      type: StateMachineConnector.type,
-      options: {
-        curviness: 50,
-      },
-    },
-    overlays: [
-      { type: 'Arrow', options: { location: 1 } },
-      {
-        type: 'Label',
-        options: { label: 'foo', location: 0.25, id: 'myLabel' },
-      },
-    ],
-    endpoints: ['Dot', 'Blank'],
-  })
+  createConnect(nodeRefs.value[0].$el, nodeRefs.value[1].$el)
+  // plumbIns.connect({
+  //   // 对应上述基本概念
+  //   source: nodeRefs.value[0].$el,
+  //   target: nodeRefs.value[1].$el,
+  //   anchor: 'AutoDefault',
+  //   connector: {
+  //     type: StateMachineConnector.type,
+  //     options: {
+  //       curviness: 50,
+  //     },
+  //   },
+  //   overlays: [
+  //     { type: 'Arrow', options: { location: 1 } },
+  //     {
+  //       type: 'Label',
+  //       options: { label: 'foo', location: 0.25, id: 'myLabel' },
+  //     },
+  //   ],
+  //   endpoints: ['Dot', 'Blank'],
+  // })
 }
 const connection1 = () => {
   const ep1 = plumbIns.addEndpoint(nodeRefs.value[2].$el, { endpoint: 'Dot' })
@@ -86,16 +82,30 @@ const flowWrapperStyle = computed(() => {
 })
 
 const nodeRefs = ref<InstanceType<typeof BaseNode>[]>([])
-
+// 设置画布的left 和 top 偏移量
 const handleSpaceMouseMove = (resultPoint: resultXY) => {
-  console.log('delta', resultPoint)
   wrapperPosition.left = resultPoint.x
   wrapperPosition.top = resultPoint.y
-  console.log('space + left mouse move')
 }
+// 设置画布的缩放比例
 const handleScale = (zoom: number) => {
-  console.log('zoom==>', zoom)
   scale.value += zoom
+}
+
+const getWrapperStyle = computed(() => {
+  return {
+    backgroundSize: `${20 * scale.value}px ${20 * scale.value}px`,
+  }
+})
+
+const handleFlowMoveItem = (event: any) => {
+  console.log('handleFlowMoveItem==>', event)
+}
+const handleFlowMoveStart = (event: any) => {
+  console.log('handleFlowMoveStart==>', event)
+}
+const handleFlowMoveEnd = (event: any) => {
+  console.log('handleFlowMoveEnd==>', event)
 }
 </script>
 <script lang="ts">
@@ -106,35 +116,56 @@ export default {
 <template>
   <div class="wrapper">
     <div class="menuWrapper">
-      <div
+      <draggable
         class="menuItem"
-        v-for="(menuItem, index) in NodeConfig"
-        :key="index"
+        :list="NodeConfig"
+        item-key="id"
+        :group="{ name: 'node', pull: 'clone', put: false }"
+        :move="handleFlowMoveItem"
+        @start="handleFlowMoveStart"
+        @end="handleFlowMoveEnd"
+        :sort="false"
       >
-        <div class="menuItem-template">
-          <BaseNode
-            :type="menuItem.type"
-            :width="menuItem.width"
-            :height="menuItem.height"
-            left="50px"
-            top="50px"
-            style="position: static"
-          ></BaseNode>
-        </div>
-        <h3 class="menuItem-name">{{ menuItem.name }}</h3>
-      </div>
+        <template #item="{ element }">
+          <div class="menuItem-template">
+            <BaseNode
+              :type="element.type"
+              :width="element.width"
+              :height="element.height"
+              :ref="element.ref"
+              left="50px"
+              top="50px"
+              style="position: static"
+            ></BaseNode>
+          </div>
+        </template>
+      </draggable>
     </div>
-
     <div
       class="flowWrapper"
+      :style="getWrapperStyle"
       v-mousedownspace="handleSpaceMouseMove"
       v-mousewheelalt="handleScale"
     >
+      <div class="zoomTool">
+        <div class="zoom-button zoomIn" @click="handleScale(0.1)">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+        <div class="zoom-button zoomOut" @click="handleScale(-0.1)">
+          <i class="fa-solid fa-minus"></i>
+        </div>
+      </div>
       <div
         :style="flowWrapperStyle"
         class="flowWrapper-container"
         ref="wrapper"
       >
+        <draggable
+          class="node-addible"
+          :group="{ name: 'node', pull: false, put: true }"
+        >
+          <template #item> </template>
+        </draggable>
         <BaseNode
           v-for="node in defaultFlowGraph"
           ref="nodeRefs"
@@ -179,6 +210,7 @@ export default {
   }
 }
 .flowWrapper {
+  position: relative;
   flex: 1 1 auto;
   box-sizing: border-box;
   background: url('@/assets/image/point.png') repeat;
@@ -186,7 +218,7 @@ export default {
   height: 100%;
   overflow: hidden;
   transform-origin: top left;
-  transition: all 0.3s linear;
+  // transition: all 0.3s linear;
   &-container {
     position: relative;
     width: 100%;
@@ -205,5 +237,42 @@ export default {
   font-family: sans-serif;
   border-radius: 4px;
   margin-right: 60px;
+}
+
+.zoomTool {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 99;
+  .zoom-button {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    background-color: #87ceeb;
+    text-align: center;
+    color: #fff;
+    cursor: pointer;
+    &:hover {
+      background-color: #3fb1df;
+    }
+  }
+}
+
+// 加号
+.node-addible {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px dashed #c2c2c2;
+  position: relative;
+  &:after {
+    content: '+';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #c2c2c2;
+  }
 }
 </style>
