@@ -15,6 +15,8 @@ export const createConnect = (
   source: HTMLElement | Endpoint,
   target: HTMLElement | Endpoint
 ) => {
+  console.log('source==>',source);
+  console.log('target==>',target);
   if (plumbIns) {
     // 定义了一条连接线
     plumbIns.connect({
@@ -38,9 +40,9 @@ export const createConnect = (
               console.log('component==>', component)
               console.log('source', source)
               console.log('target', target)
-
+              console.log(source.id)
               const addibleNodeEle = document.getElementById(
-                'addibleNode' + source.id
+                'addibleNode-' + source.id
               )
               if(addibleNodeEle){
                 addibleNodeEle.dataset.source = JSON.parse(
@@ -50,6 +52,7 @@ export const createConnect = (
                   JSON.stringify(target)
                 )
               }
+              console.log('addibleNodeEle==>', addibleNodeEle)
               return addibleNodeEle || null
             },
             location: 0.5,

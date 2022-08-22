@@ -19,16 +19,16 @@ const jsplumbInit = () => {
 
 const drawFlowGraph = () => {
   // 画图
-  defaultFlowGraph.forEach((node)=>{
-    const prevNodeRef = refsList.find(item=>item.id === node.stepId)
-    const nextNodeRef = refsList.find(item=>item.id === node.nextStepId)
-    if(prevNodeRef){
-      if(nextNodeRef){
+  defaultFlowGraph.forEach((node) => {
+    const prevNodeRef = refsList.find((item) => item.id === node.stepId)
+    const nextNodeRef = refsList.find((item) => item.id === node.nextStepId)
+    console.log('prevNodeRef',prevNodeRef);
+    console.log('nextNodeRef',nextNodeRef);
+    if (prevNodeRef) {
+      if (nextNodeRef) {
         createConnect(prevNodeRef.$el, nextNodeRef.$el)
-
       }
     }
-
   })
 }
 
@@ -83,10 +83,9 @@ const handleFlowMoveEnd = (event: any) => {
 }
 const refsList: InstanceType<typeof BaseNode>[] = []
 const getRefs = (el: any) => {
-  console.log('el==>',el);
+  console.log('el==>', el)
   refsList.push(el)
 }
-
 </script>
 <script lang="ts">
 export default {
@@ -143,7 +142,7 @@ export default {
         <template v-for="node in defaultFlowGraph" :key="node.stepId">
           <draggable
             class="node-addible"
-            :id="'addibleNode'+node.stepId"
+            :id="'addibleNode-' + node.stepId"
             :group="{ name: 'node', pull: false, put: true }"
           >
             <template #item> </template>

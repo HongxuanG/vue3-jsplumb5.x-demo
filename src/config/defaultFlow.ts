@@ -7,7 +7,7 @@ export const defaultFlowGraph = [
     type: EnumNode.SQUARE,
     width: '100px',
     height: '100px',
-    top: '100px',
+    top: '10px',
     left: '100px',
     nextStepId: '7edf6f19-50ab-4047-aba0-bff0f1112450',
   },
@@ -29,7 +29,7 @@ export const defaultFlowGraph = [
     height: '100px',
     top: '450px',
     left: '100px',
-    nextStep: 'fae270c9-a657-4859-94f3-fba25cf962b6',
+    nextStepId: 'fae270c9-a657-4859-94f3-fba25cf962b6',
   },
   {
     stepId: 'fae270c9-a657-4859-94f3-fba25cf962b6',
@@ -39,6 +39,6 @@ export const defaultFlowGraph = [
     height: '40px',
     top: '610px',
     left: '100px',
-    nextStep: null,
+    nextStepId: null,
   },
 ]

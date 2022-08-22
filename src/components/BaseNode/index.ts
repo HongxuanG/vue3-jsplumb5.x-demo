@@ -10,7 +10,7 @@ export default defineComponent({
     },
     id: {
       type: String,
-      require: true
+      require: true,
     },
     width: {
       type: [String, Number],
@@ -46,26 +46,39 @@ export default defineComponent({
         left: normalizeStyleValue(props.left),
       })
     })
-    const BaseRenderer = () => h(
-      'div',
-      { class: `node node-${props.type}`, style: nodeStyle.value },
-      [h('div', { class: 'node-content' }, slots.default?.())]
-    )
+    const BaseRenderer = () =>
+      h(
+        'div',
+        {
+          id: props.id,
+          class: `node node-${props.type}`,
+          style: nodeStyle.value,
+        },
+        [h('div', { class: 'node-content' }, slots.default?.())]
+      )
     const DeltaRenderer = () => {
       const x = parseFloat(props.width + '')
       const y = parseFloat(props.height + '')
       return h(
-        'svg',
+        'div',
         {
-          width: normalizeStyleValue(props.width),
-          height: normalizeStyleValue(props.height),
+          id: props.id,
           style: `position: absolute; top: ${props.top}; left: ${props.left};`,
         },
         [
-          h('polygon', {
-            points: `${x},${y} ${x / 2},0 0,${y}`,
-            style: 'fill: #ffffff; stroke: #000; stroke-width: 1',
-          }),
+          h(
+            'svg',
+            {
+              width: normalizeStyleValue(props.width),
+              height: normalizeStyleValue(props.height),
+            },
+            [
+              h('polygon', {
+                points: `${x},${y} ${x / 2},0 0,${y}`,
+                style: 'fill: #ffffff; stroke: #000; stroke-width: 1',
+              }),
+            ]
+          ),
         ]
       )
     }
